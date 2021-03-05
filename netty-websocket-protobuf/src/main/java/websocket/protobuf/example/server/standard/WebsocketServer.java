@@ -1,6 +1,6 @@
 package websocket.protobuf.example.server.standard;
 
-import websocket.protobuf.example.server.ServerEventListener;
+import websocket.protobuf.example.server.EventListener;
 import websocket.protobuf.example.server.config.ServerEndpointConfig;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
@@ -20,10 +20,10 @@ import java.net.UnknownHostException;
 @Slf4j
 public class WebsocketServer {
 
-    private final ServerEventListener endpointServer;
+    private final EventListener endpointServer;
     private final ServerEndpointConfig config;
 
-    public WebsocketServer(ServerEventListener endpointServer, ServerEndpointConfig config) {
+    public WebsocketServer(EventListener endpointServer, ServerEndpointConfig config) {
         this.endpointServer = endpointServer;
         this.config = config;
     }

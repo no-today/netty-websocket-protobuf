@@ -8,7 +8,7 @@ import io.netty.handler.codec.http.websocketx.PingWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.PongWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import websocket.protobuf.example.protocol.ProtobufMessageModule;
-import websocket.protobuf.example.server.ServerEventListener;
+import websocket.protobuf.example.server.EventListener;
 
 /**
  * @author no-today
@@ -16,10 +16,10 @@ import websocket.protobuf.example.server.ServerEventListener;
  */
 public class WebsocketServerHandler extends ChannelInboundHandlerAdapter {
 
-    private final ServerEventListener endpointServer;
+    private final EventListener eventListener;
 
-    public WebsocketServerHandler(ServerEventListener endpointServer) {
-        this.endpointServer = endpointServer;
+    public WebsocketServerHandler(EventListener eventListener) {
+        this.eventListener = eventListener;
     }
 
     @Override
@@ -39,17 +39,17 @@ public class WebsocketServerHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        endpointServer.doOnClose(ctx.channel());
+        eventListener.doOnClose(ctx.channel());
     }
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         if (msg instanceof ProtobufMessageModule.Message) {
-            endpointServer.doOnBinaryMessage(ctx.channel(), (ProtobufMessageModule.Message) msg);
+            eventListener.doOnBinaryMessage(ctx.channel(), (ProtobufMessageModule.Message) msg);
             return;
         }
         if (msg instanceof TextWebSocketFrame) {
-            endpointServer.doOnTextMessage(ctx.channel(), (TextWebSocketFrame) msg);
+            eventListener.doOnTextMessage(ctx.channel(), (TextWebSocketFrame) msg);
             return;
         }
         if (msg instanceof PingWebSocketFrame) {
@@ -73,7 +73,7 @@ public class WebsocketServerHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
-        endpointServer.doOnEvent(ctx.channel(), evt);
+        eventListener.doOnEvent(ctx.channel(), evt);
     }
 
     @Override
@@ -83,6 +83,6 @@ public class WebsocketServerHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        endpointServer.doOnError(ctx.channel(), cause);
+        eventListener.doOnError(ctx.channel(), cause);
     }
 }

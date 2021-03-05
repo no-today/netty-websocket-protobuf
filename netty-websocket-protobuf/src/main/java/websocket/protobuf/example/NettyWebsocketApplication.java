@@ -7,7 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
-import websocket.protobuf.example.server.ServerEventListener;
+import websocket.protobuf.example.server.EventListener;
 import websocket.protobuf.example.server.config.ServerEndpointConfig;
 import websocket.protobuf.example.server.standard.WebsocketServer;
 import websocket.protobuf.example.server.support.EnhanceChannelGroup;
@@ -18,7 +18,7 @@ import javax.annotation.Resource;
 public class NettyWebsocketApplication implements ApplicationListener<ApplicationReadyEvent> {
 
     @Resource
-    private ServerEventListener serverEventListener;
+    private EventListener eventListener;
 
     public static void main(String[] args) {
         SpringApplication.run(NettyWebsocketApplication.class, args);
@@ -32,6 +32,6 @@ public class NettyWebsocketApplication implements ApplicationListener<Applicatio
     @SneakyThrows
     @Override
     public void onApplicationEvent(ApplicationReadyEvent applicationReadyEvent) {
-        new WebsocketServer(serverEventListener, ServerEndpointConfig.defaultConfig()).init();
+        new WebsocketServer(eventListener, ServerEndpointConfig.defaultConfig()).init();
     }
 }

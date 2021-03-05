@@ -11,7 +11,7 @@ import websocket.protobuf.example.protocol.ProtobufMessageModule;
  * @author no-today
  * @date 2021/02/25 下午2:32
  */
-public interface ServerEventListener {
+public interface EventListener {
 
     /**
      * 是否执行在握手之前触发的勾子函数

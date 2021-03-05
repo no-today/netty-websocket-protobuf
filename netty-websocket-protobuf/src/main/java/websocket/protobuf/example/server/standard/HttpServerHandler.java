@@ -20,7 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.TypeMismatchException;
 import org.springframework.util.StringUtils;
 import websocket.protobuf.example.protocol.ProtobufMessageModule;
-import websocket.protobuf.example.server.ServerEventListener;
+import websocket.protobuf.example.server.EventListener;
 import websocket.protobuf.example.server.config.ServerEndpointConfig;
 import websocket.protobuf.example.server.support.WsPathMatcher;
 
@@ -32,11 +32,11 @@ import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 @Slf4j
 class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
 
-    private final ServerEventListener serverEventListener;
+    private final EventListener eventListener;
     private final ServerEndpointConfig config;
 
-    public HttpServerHandler(ServerEventListener serverEventListener, ServerEndpointConfig config) {
-        this.serverEventListener = serverEventListener;
+    public HttpServerHandler(EventListener eventListener, ServerEndpointConfig config) {
+        this.eventListener = eventListener;
         this.config = config;
     }
 
@@ -58,12 +58,12 @@ class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        serverEventListener.doOnError(ctx.channel(), cause);
+        eventListener.doOnError(ctx.channel(), cause);
     }
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        serverEventListener.doOnClose(ctx.channel());
+        eventListener.doOnClose(ctx.channel());
         super.channelInactive(ctx);
     }
 
@@ -128,8 +128,8 @@ class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
 
         String subprotocols = null;
 
-        if (serverEventListener.hasBeforeHandshake(channel)) {
-            serverEventListener.doBeforeHandshake(channel, req);
+        if (eventListener.hasBeforeHandshake(channel)) {
+            eventListener.doBeforeHandshake(channel, req);
 
             if (!channel.isActive()) {
                 return;
@@ -166,11 +166,11 @@ class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
             pipeline.addLast(new ProtobufVarint32LengthFieldPrepender());
 
             pipeline.addLast(new WebSocketFrameAggregator(Integer.MAX_VALUE));
-            pipeline.addLast(new WebsocketServerHandler(serverEventListener));
+            pipeline.addLast(new WebsocketServerHandler(eventListener));
 
             handshaker.handshake(channel, req).addListener(future -> {
                 if (future.isSuccess()) {
-                    serverEventListener.doOnOpen(channel, req);
+                    eventListener.doOnOpen(channel, req);
                 } else {
                     handshaker.close(channel, new CloseWebSocketFrame());
                 }

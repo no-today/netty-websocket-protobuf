@@ -20,7 +20,7 @@ import java.util.Optional;
  */
 @Slf4j
 @Component
-public class DefaultServerEventListener implements ServerEventListener {
+public class DefaultServerEventListener implements EventListener {
 
     private final CommandStrategyFactory commandStrategyFactory;
     private final ChannelGroup channelGroup;
